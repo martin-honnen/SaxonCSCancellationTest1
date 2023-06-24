@@ -15,7 +15,7 @@ var xsltExecutable = xsltCompiler.Compile(new Uri(Path.Combine(Environment.Curre
 //Create an Instance of CancellationTokenSource
 var CTS = new CancellationTokenSource();
 //Set when the token is going to cancel the parallel execution
-CTS.CancelAfter(TimeSpan.FromMilliseconds(100));
+CTS.CancelAfter(TimeSpan.FromMilliseconds(800));
 //Create an instance of ParallelOptions class
 var parallelOptions = new ParallelOptions()
 {
@@ -34,7 +34,7 @@ try
 
         xslt30Transformer.SetStylesheetParameters(new Dictionary<QName, XdmValue> { { new QName("cancellation-token"), new XdmExternalObject(parallelOptions.CancellationToken) } });
 
-        var inputDoc = docBuilder.Build(new StringReader($"<root><test>{index}</test></root>"));
+        var inputDoc = docBuilder.Build(new Uri(Path.Combine(Environment.CurrentDirectory, "input-sample-10000.xml")));//docBuilder.Build(new StringReader($"<root><test>{index}</test></root>"));
 
         using var resultStream = File.OpenWrite($"result-{index}.xml");
 
