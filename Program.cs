@@ -10,7 +10,7 @@ var docBuilder = processor.NewDocumentBuilder();
 
 var xsltCompiler = processor.NewXsltCompiler();
 
-var xsltExecutable = xsltCompiler.Compile(new Uri(Path.Combine(Environment.CurrentDirectory, "cancel-test1.xsl")));
+var xsltExecutable = xsltCompiler.Compile(new Uri(Path.Combine(Environment.CurrentDirectory, "cancel-test1-streaming.xsl")));
 
 //Create an Instance of CancellationTokenSource
 var CTS = new CancellationTokenSource();
@@ -34,13 +34,15 @@ try
 
         xslt30Transformer.SetStylesheetParameters(new Dictionary<QName, XdmValue> { { new QName("cancellation-token"), new XdmExternalObject(parallelOptions.CancellationToken) } });
 
-        var inputDoc = docBuilder.Build(new Uri(Path.Combine(Environment.CurrentDirectory, "input-sample-10000.xml")));//docBuilder.Build(new StringReader($"<root><test>{index}</test></root>"));
+        //var inputDoc = docBuilder.Build(new Uri(Path.Combine(Environment.CurrentDirectory, "input-sample-10000.xml")));//docBuilder.Build(new StringReader($"<root><test>{index}</test></root>"));
+
+        using var inputStream = File.OpenRead("input-sample-10000.xml");
 
         using var resultStream = File.OpenWrite($"result-{index}.xml");
 
         try
         {
-            xslt30Transformer.ApplyTemplates(inputDoc, processor.NewSerializer(resultStream));
+            xslt30Transformer.ApplyTemplates(inputStream, processor.NewSerializer(resultStream));//xslt30Transformer.ApplyTemplates(inputDoc, processor.NewSerializer(resultStream));
         }
         catch (SaxonApiException e)
         {
